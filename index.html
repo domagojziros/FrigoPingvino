@@ -91,9 +91,6 @@
   <!-- ─── FONTS ─── -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
 
-  <!-- ─── EMAILJS ─── -->
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
-
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -627,43 +624,26 @@
       </div>
     </div>
 
-    <!-- FORMA -->
-    <div class="contact-form" role="form" aria-labelledby="forma-heading">
-      <h3 id="forma-heading">Pošaljite upit</h3>
-      <div id="formStatus" class="form-status" role="alert" aria-live="polite" tabindex="-1"></div>
-      <div id="contactForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="fieldIme">Ime i prezime <span aria-label="obavezno polje">*</span></label>
-            <input id="fieldIme" type="text" placeholder="Vaše ime" autocomplete="name" required />
-          </div>
-          <div class="form-group">
-            <label for="fieldTel">Telefon <span aria-label="obavezno polje">*</span></label>
-            <input id="fieldTel" type="tel" placeholder="09X XXX XXXX" autocomplete="tel" required />
-          </div>
+    <!-- GOOGLE MAPS -->
+    <div class="contact-map" aria-label="Lokacija Frigo Pingvino na karti">
+      <div class="contact-map-label">
+        <span class="contact-map-pin" aria-hidden="true">📍</span>
+        <div>
+          <div class="contact-map-title">Naša lokacija</div>
+          <div class="contact-map-address">Trpinjska cesta 163, Vukovar</div>
         </div>
-        <div class="form-group">
-          <label for="fieldEmail">Email</label>
-          <input id="fieldEmail" type="email" placeholder="vas@email.com" autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label for="fieldUsluga">Vrsta usluge</label>
-          <select id="fieldUsluga" autocomplete="off">
-            <option value="">Odaberite uslugu...</option>
-            <option value="Montaža klima uređaja">Montaža klima uređaja</option>
-            <option value="Servis i održavanje">Servis i održavanje</option>
-            <option value="Dobava uređaja">Dobava uređaja</option>
-            <option value="Dijagnostika i popravak">Dijagnostika i popravak</option>
-            <option value="Poslovni prostor">Poslovni prostor</option>
-            <option value="Ostalo">Ostalo</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="fieldPoruka">Poruka <span aria-label="obavezno polje">*</span></label>
-          <textarea id="fieldPoruka" placeholder="Opišite što vam treba..." required></textarea>
-        </div>
-        <button id="submitBtn" class="btn-submit" type="button" onclick="submitForm()">Pošalji upit 🚀</button>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Trpinjska+cesta+163,+Vukovar" target="_blank" rel="noopener noreferrer" class="contact-map-directions">Upute ↗</a>
       </div>
+      <iframe
+        title="Frigo Pingvino lokacija – Trpinjska cesta 163, Vukovar"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2783.4!2d18.9983!3d45.3564!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x475b6c3f7e3b6a1b%3A0x0!2sTrpinjska+cesta+163%2C+32000+Vukovar!5e0!3m2!1shr!2shr!4v1"
+        width="100%"
+        height="340"
+        style="border:0; border-radius: 16px;"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
     </div>
   </div>
 </section>
@@ -675,11 +655,33 @@
     <img src="logo.jpg" alt="Frigo Pingvino" width="36" height="36" loading="lazy" />
     <span>Frigo Pingvino</span>
   </a>
-  <p class="footer-text">© <span id="footerYear"></span> Frigo Pingvino. Sva prava pridržana.</p>
-  <div class="footer-social">
+  <p class="footer-text">© <span id="footerYear"></span> Frigo Pingvino obrt za usluge, vl. Matej Andrijančić</p>
+  <div class="footer-links">
     <a href="https://www.instagram.com/frigopingvino" target="_blank" rel="noopener noreferrer" aria-label="Posjetite nas na Instagramu">📸 Instagram</a>
+    <span class="footer-divider" aria-hidden="true">·</span>
+    <a href="https://www.fininfo.hr/Poduzece/Pregled/frigo-pingvino-obrt-za-usluge-vl-matej-andrijanic/Detaljno/939852" target="_blank" rel="noopener noreferrer">Podaci o obrtu</a>
+    <span class="footer-divider" aria-hidden="true">·</span>
+    <a href="#privacy" id="privacyLink">Pravila privatnosti</a>
   </div>
 </footer>
+
+<!-- PRIVACY POLICY MODAL -->
+<div class="privacy-modal" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" hidden>
+  <div class="privacy-modal-inner">
+    <button class="privacy-close" id="privacyClose" aria-label="Zatvori">✕</button>
+    <h2 id="privacyTitle">Pravila privatnosti</h2>
+    <p><strong>Naziv obrta:</strong> Frigo Pingvino obrt za usluge, vl. Matej Andrijančić</p>
+    <p><strong>Kontakt:</strong> Frigo.pingvino@gmail.com · 097 748 2691</p>
+    <h3>Prikupljanje podataka</h3>
+    <p>Ova web stranica ne prikuplja osobne podatke posjetitelja automatski. Kontaktni podaci koje nam dostavite (ime, telefon, email) koriste se isključivo za odgovor na vaš upit i ne dijele se s trećim stranama.</p>
+    <h3>Kolačići (cookies)</h3>
+    <p>Stranica koristi Google Maps embed koji može postavljati tehničke kolačiće. Pregledavanjem stranice pristajete na ove uvjete.</p>
+    <h3>Vaša prava</h3>
+    <p>U skladu s GDPR-om imate pravo na pristup, ispravak i brisanje vaših podataka. Za zahtjeve pišite na Frigo.pingvino@gmail.com.</p>
+    <p class="privacy-updated">Zadnje ažuriranje: lipanj 2026.</p>
+  </div>
+</div>
+<div class="privacy-overlay" id="privacyOverlay"></div>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Pregled slike">

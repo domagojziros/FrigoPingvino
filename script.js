@@ -406,86 +406,30 @@ lightboxEl.addEventListener('mouseup', e => {
   }
 });
 
-// ─── INPUT SANITISATION ───
-function sanitizeInput(str) {
-  const div = document.createElement('div');
-  div.appendChild(document.createTextNode(str));
-  return div.innerHTML;
+// ─── PRIVACY MODAL ───
+const privacyModal   = document.getElementById('privacyModal');
+const privacyOverlay = document.getElementById('privacyOverlay');
+const privacyClose   = document.getElementById('privacyClose');
+const privacyLink    = document.getElementById('privacyLink');
+
+function openPrivacy(e) {
+  e.preventDefault();
+  privacyModal.hidden = false;
+  privacyOverlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  privacyClose.focus();
 }
 
-// ─── EMAILJS SETUP ───
-const EMAILJS_SERVICE_ID  = 'VAŠE_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'VAŠE_TEMPLATE_ID';
-const EMAILJS_PUBLIC_KEY  = 'VAŠE_PUBLIC_KEY';
+function closePrivacy() {
+  privacyModal.hidden = true;
+  privacyOverlay.classList.remove('visible');
+  document.body.style.overflow = '';
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-  if (typeof emailjs !== 'undefined' && EMAILJS_PUBLIC_KEY !== 'VAŠE_PUBLIC_KEY') {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-  }
+if (privacyLink)    privacyLink.addEventListener('click', openPrivacy);
+if (privacyClose)   privacyClose.addEventListener('click', closePrivacy);
+if (privacyOverlay) privacyOverlay.addEventListener('click', closePrivacy);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && privacyModal && !privacyModal.hidden) closePrivacy();
 });
-
-// ─── FORM SUBMIT ───
-async function submitForm() {
-  const btn    = document.getElementById('submitBtn');
-  const status = document.getElementById('formStatus');
-
-  const ime    = sanitizeInput(document.getElementById('fieldIme').value.trim());
-  const tel    = sanitizeInput(document.getElementById('fieldTel').value.trim());
-  const email  = sanitizeInput(document.getElementById('fieldEmail').value.trim());
-  const usluga = sanitizeInput(document.getElementById('fieldUsluga').value);
-  const poruka = sanitizeInput(document.getElementById('fieldPoruka').value.trim());
-
-  if (!ime || !tel || !poruka) {
-    showStatus('error', '⚠️ Molimo ispunite ime, telefon i poruku.');
-    return;
-  }
-  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showStatus('error', '⚠️ Molimo unesite ispravnu email adresu.');
-    return;
-  }
-  if (!/^[\d\s+\-()]{7,20}$/.test(tel)) {
-    showStatus('error', '⚠️ Molimo unesite ispravan broj telefona.');
-    return;
-  }
-
-  btn.disabled  = true;
-  btn.innerHTML = '<span class="spinner" aria-hidden="true"></span> Šaljem...';
-  status.style.display = 'none';
-
-  if (EMAILJS_SERVICE_ID === 'VAŠE_SERVICE_ID') {
-    await new Promise(r => setTimeout(r, 1200));
-    btn.disabled  = false;
-    btn.innerHTML = 'Pošalji upit 🚀';
-    showStatus('error', '⚙️ EmailJS još nije konfiguriran.');
-    return;
-  }
-
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      from_name:    ime,
-      phone:        tel,
-      reply_to:     email || 'nije naveden',
-      service_type: usluga || 'nije odabrano',
-      message:      poruka,
-    });
-    showStatus('success', '✅ Upit je uspješno poslan! Kontaktirat ćemo vas uskoro.');
-    ['fieldIme','fieldTel','fieldEmail','fieldUsluga','fieldPoruka'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    showStatus('error', '❌ Slanje nije uspjelo. Nazovite: 097 748 2691 ili pišite: Frigo.pingvino@gmail.com');
-  } finally {
-    btn.disabled  = false;
-    btn.innerHTML = 'Pošalji upit 🚀';
-  }
-}
-
-function showStatus(type, msg) {
-  const el = document.getElementById('formStatus');
-  el.className     = 'form-status ' + type;
-  el.textContent   = msg;
-  el.style.display = 'block';
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  el.focus();
-}
