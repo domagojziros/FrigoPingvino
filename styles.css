@@ -343,12 +343,13 @@ nav#navbar {
   animation: snow linear infinite;
   user-select: none;
   will-change: transform;
+  contain: layout style;
 }
 
 @keyframes snow {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-  10% { opacity: 1; }
-  90% { opacity: 0.5; }
+  0%   { transform: translateY(0) rotate(0deg);    opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 0.4; }
   100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
 }
 
@@ -1425,6 +1426,42 @@ footer {
   .review-slide .review-text.expanded { max-height: 220px; }
   .lightbox-nav { display: none; }
   .privacy-modal-inner { padding: 28px 20px; }
+}
+
+/* ─── MOBILE PERFORMANCE ───
+   Remove expensive GPU effects on low-power devices */
+@media (max-width: 768px) {
+  nav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(13,27,62,0.98) !important;
+  }
+
+  .mobile-menu {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(10,20,50,0.99);
+  }
+
+  .lightbox {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* Reduce snowflakes on mobile - hide half of them */
+  .snowflake:nth-child(odd) { display: none; }
+
+  /* Simpler fade-in on mobile */
+  .fade-in {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  /* Disable hover transforms that cause repaints */
+  .service-card:hover,
+  .review-card:hover,
+  .contact-card:hover {
+    transform: none;
+  }
 }
 
 /* ─── PRINT ─── */

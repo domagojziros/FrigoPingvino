@@ -4,15 +4,17 @@ document.getElementById('footerYear').textContent = new Date().getFullYear();
 // ─── SNOWFLAKES ───
 const sf = document.getElementById('snowflakes');
 const snowSymbols = ['❄', '❅', '❆'];
-for (let i = 0; i < 18; i++) {
+// Fewer snowflakes on mobile = less GPU work
+const snowCount = window.innerWidth < 768 ? 8 : 18;
+for (let i = 0; i < snowCount; i++) {
   const s = document.createElement('div');
   s.className = 'snowflake';
   s.textContent = snowSymbols[i % 3];
   s.style.cssText = [
     `left:${Math.random() * 100}%`,
-    `animation-duration:${6 + Math.random() * 10}s`,
+    `animation-duration:${7 + Math.random() * 9}s`,
     `animation-delay:${Math.random() * 10}s`,
-    `font-size:${0.7 + Math.random() * 1.2}rem`
+    `font-size:${0.7 + Math.random() * 1.0}rem`
   ].join(';');
   sf.appendChild(s);
 }
@@ -44,6 +46,7 @@ ham.addEventListener('click', () => mob.classList.contains('open') ? closeMobile
 overlay.addEventListener('click', closeMobile);
 
 // ─── SCROLL FADE-IN ───
+const isMobile = window.innerWidth < 768;
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -51,7 +54,7 @@ const observer = new IntersectionObserver((entries) => {
       observer.unobserve(entry.target);
     }
   });
-}, { threshold: 0.08 });
+}, { threshold: isMobile ? 0.04 : 0.08, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
 
