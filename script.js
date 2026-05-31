@@ -243,48 +243,12 @@ createCarousel({
 // ════════════════════════
 // LIGHTBOX
 // ════════════════════════
-const lightboxEl    = document.getElementById('lightbox');
-const lightboxImg   = document.getElementById('lightboxImg');
-const lightboxCtr   = document.getElementById('lightboxCounter');
-const lightboxClose = document.getElementById('lightboxClose');
-const lightboxPrev  = document.getElementById('lightboxPrev');
-const lightboxNext  = document.getElementById('lightboxNext');
 
-// gallery images (only non-review slides)
-const galleryImgs = Array.from(
-  document.querySelectorAll('#carouselTrack .carousel-slide img')
-);
-let lbIdx = 0;
-
-function openLightbox(idx) {
-  lbIdx = idx;
-  const img = galleryImgs[idx];
-  lightboxImg.src = img.src;
-  lightboxImg.alt = img.alt;
-  lightboxCtr.textContent = `${idx + 1} / ${galleryImgs.length}`;
-  lightboxEl.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  lightboxPrev.disabled = idx === 0;
-  lightboxNext.disabled = idx === galleryImgs.length - 1;
-}
-
-function closeLightbox() {
-  lightboxEl.classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function lbNav(dir) {
-  const n = lbIdx + dir;
-  if (n >= 0 && n < galleryImgs.length) openLightbox(n);
-}
-
-// Attach click — only open if user didn't drag
-// We use a shared flag so carousel drag doesn't trigger lightbox
+// ── SHARED DRAG FLAG — declared first so all handlers can use it ──
 let galleryTouchStartX = 0;
 let galleryTouchStartY = 0;
 let galleryTouchMoved  = false;
 
-// Track finger movement on the whole track
 const galleryTrackEl = document.getElementById('carouselTrack');
 galleryTrackEl.addEventListener('touchstart', e => {
   galleryTouchStartX = e.touches[0].clientX;
@@ -297,16 +261,74 @@ galleryTrackEl.addEventListener('touchmove', e => {
   if (dx > 8 || dy > 8) galleryTouchMoved = true;
 }, { passive: true });
 
+// ── LIGHTBOX — handles images AND video ──
+// Build a unified media list: { type:'img'|'video', src, alt }
+const galleryMedia = Array.from(
+  document.querySelectorAll('#carouselTrack .carousel-slide')
+).map(slide => {
+  const video = slide.querySelector('video');
+  if (video) return { type: 'video', src: video.getAttribute('src') || 'klima10.mp4' };
+  const img = slide.querySelector('img');
+  if (img) return { type: 'img', src: img.getAttribute('src'), alt: img.alt };
+  return null;
+}).filter(Boolean);
+
+let lbIdx = 0;
+
+const lightboxEl    = document.getElementById('lightbox');
+const lightboxImg   = document.getElementById('lightboxImg');
+const lightboxVideo = document.getElementById('lightboxVideo');
+const lightboxCtr   = document.getElementById('lightboxCounter');
+const lightboxClose = document.getElementById('lightboxClose');
+const lightboxPrev  = document.getElementById('lightboxPrev');
+const lightboxNext  = document.getElementById('lightboxNext');
+
+function openLightbox(idx) {
+  lbIdx = idx;
+  const media = galleryMedia[idx];
+  if (!media) return;
+
+  if (media.type === 'video') {
+    lightboxImg.style.display = 'none';
+    lightboxVideo.style.display = 'block';
+    lightboxVideo.src = media.src;
+    lightboxVideo.load();
+    lightboxVideo.play().catch(() => {});
+  } else {
+    lightboxVideo.pause();
+    lightboxVideo.style.display = 'none';
+    lightboxImg.style.display = 'block';
+    lightboxImg.src = media.src;
+    lightboxImg.alt = media.alt || '';
+  }
+
+  lightboxCtr.textContent = `${idx + 1} / ${galleryMedia.length}`;
+  lightboxEl.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  lightboxPrev.disabled = idx === 0;
+  lightboxNext.disabled = idx === galleryMedia.length - 1;
+}
+
+function closeLightbox() {
+  lightboxVideo.pause();
+  lightboxVideo.src = '';
+  lightboxEl.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function lbNav(dir) {
+  const n = lbIdx + dir;
+  if (n >= 0 && n < galleryMedia.length) openLightbox(n);
+}
+
+// Attach click on every gallery slide (images AND video)
 document.querySelectorAll('#carouselTrack .carousel-slide').forEach((slide, i) => {
-  // Mouse: track mousedown position, open on click only if barely moved
   let mouseDownX = 0;
   slide.addEventListener('mousedown', e => { mouseDownX = e.clientX; });
   slide.addEventListener('click', e => {
     if (Math.abs(e.clientX - mouseDownX) < 10) openLightbox(i);
   });
 
-  // Touch: use the shared track-level flag — wait one tick so carousel
-  // onDragEnd runs first and sets galleryTouchMoved correctly
   slide.addEventListener('touchend', () => {
     setTimeout(() => {
       if (!galleryTouchMoved) openLightbox(i);
